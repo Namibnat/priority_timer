@@ -23,7 +23,7 @@ class TestTimer:
     @staticmethod
     def instantiate_timer(activity=None):
         """Instantiate a timer"""
-        return Timer(activity=activity, record_file=Constants.RECORD_FILE)
+        return Timer(activity=activity, record_file=Constants.RECORD_FILE, logging=False)
 
     @staticmethod
     def run_timer(activity):

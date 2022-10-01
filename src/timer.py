@@ -5,8 +5,10 @@ import os
 
 import pandas as pd
 
+from src.data import TimerData
 
-class TimerData:
+
+class TimerDefines:
     """Timer data class"""
     DATE = None
     START = None
@@ -15,17 +17,20 @@ class TimerData:
 
 
 class Timer:
-    def __init__(self, activity=None, timer_dir='.timer_records', record_file='timer_records.csv', delimiter='|'):
+    def __init__(self, activity=None, timer_dir='.timer_records', record_file='timer_records.csv',
+                 delimiter='|', logging=True):
+        self.logging = logging
         self.activity = activity
         self.timer_dir = timer_dir
         self.record_file = record_file
-        self.data = TimerData()
+        self.defines = TimerDefines()
+        self.data = TimerData(timer_dir=timer_dir, record_file=record_file, delimiter=delimiter)
         self.delimiter = delimiter
         self.home = os.path.expanduser('~')
         self.create_record_file()
         self.file_data = None
         self.data_frame_columns = ['date', 'activity', 'start', 'stop', 'duration']
-        self.data.DATE = datetime.datetime.now().strftime('%d/%m/%Y')
+        self.defines.DATE = datetime.datetime.now().strftime('%d/%m/%Y')
 
     def create_record_file(self):
         if not os.path.exists(os.path.join(self.home, self.timer_dir)):
@@ -33,23 +38,24 @@ class Timer:
         if not os.path.exists(os.path.join(self.home, self.timer_dir, self.record_file)):
             with open(os.path.join(self.home, self.timer_dir, self.record_file), 'w') as f:
                 f.write('')
-            print(f'Timer record file "{self.record_file}" created')
+            if self.logging:
+                print(f'Timer record file "{self.record_file}" created')
 
     def start(self):
-        self.data.START = datetime.datetime.now()
+        self.defines.START = datetime.datetime.now()
 
     def end(self):
-        self.data.STOP = datetime.datetime.now()
-        self.data.DURATION = (self.data.STOP - self.data.START).seconds
+        self.defines.STOP = datetime.datetime.now()
+        self.defines.DURATION = (self.defines.STOP - self.defines.START).seconds
 
     def record(self):
-        self._read_record()
+        self.data.read_record()
         new_entry = [
-            self.data.DATE,
+            self.defines.DATE,
             self.activity,
-            self.data.START,
-            self.data.STOP,
-            self.data.DURATION
+            self.defines.START,
+            self.defines.STOP,
+            self.defines.DURATION
         ]
         if not all(new_entry):
             raise ValueError(f'Missing data: {new_entry}')
@@ -58,13 +64,6 @@ class Timer:
         else:
             self.file_data = self.file_data.append(pd.DataFrame([new_entry], columns=self.data_frame_columns))
         self._write_record()
-
-    def _read_record(self):
-        try:
-            self.file_data = pd.read_csv(
-                os.path.join(self.home, self.timer_dir, self.record_file), delimiter=self.delimiter)
-        except pd.errors.EmptyDataError:
-            self.file_data = None
 
     def _write_record(self):
         self.file_data.to_csv(
