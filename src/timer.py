@@ -44,7 +44,7 @@ class Timer:
         self.data.STOP = datetime.datetime.now()
         self.data.DURATION = self.data.STOP - self.data.START
 
-    def _record(self):
+    def record(self):
         self._read_record()
         new_entry = [
             self.data.DATE,
@@ -53,7 +53,9 @@ class Timer:
             self.data.STOP,
             self.data.DURATION
         ]
-        if not self.file_data:
+        if not all(new_entry):
+            raise ValueError('Missing data')
+        if not isinstance(self.file_data, pd.DataFrame):
             self.file_data = pd.DataFrame([new_entry], columns=self.data_frame_columns)
         else:
             self.file_data = self.file_data.append(pd.DataFrame([new_entry], columns=self.data_frame_columns))
