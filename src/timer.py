@@ -33,16 +33,14 @@ class Timer:
         if not os.path.exists(os.path.join(self.home, self.timer_dir, self.record_file)):
             with open(os.path.join(self.home, self.timer_dir, self.record_file), 'w') as f:
                 f.write('')
-            print('Timer record file created')
-        else:
-            print('Timer record file already exists')
+            print(f'Timer record file "{self.record_file}" created')
 
     def start(self):
         self.data.START = datetime.datetime.now()
 
     def end(self):
         self.data.STOP = datetime.datetime.now()
-        self.data.DURATION = self.data.STOP - self.data.START
+        self.data.DURATION = (self.data.STOP - self.data.START).seconds
 
     def record(self):
         self._read_record()
@@ -54,7 +52,7 @@ class Timer:
             self.data.DURATION
         ]
         if not all(new_entry):
-            raise ValueError('Missing data')
+            raise ValueError(f'Missing data: {new_entry}')
         if not isinstance(self.file_data, pd.DataFrame):
             self.file_data = pd.DataFrame([new_entry], columns=self.data_frame_columns)
         else:
@@ -72,3 +70,5 @@ class Timer:
         self.file_data.to_csv(
             os.path.join(self.home, self.timer_dir, self.record_file), index=False, sep=self.delimiter)
 
+    def __str__(self):
+        return f'Activity timer for {self.activity}'
