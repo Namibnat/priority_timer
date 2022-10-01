@@ -66,3 +66,16 @@ class TestTimerData:
             assert longest_activity.activity == activity_max
         else:
             assert False
+
+    def test_duration_for_today(self):
+        """Test duration for today"""
+        timer_data = None
+        for i in range(5):
+            activity = f'max duration {Constants.UNIQUE_ID} {i}'
+            timer = run_timer(activity)
+            timer_data = TimerData(record_file=timer.record_file)
+        if hasattr(timer_data, 'sum_duration_for_today'):
+            today_duration = timer_data.sum_duration_for_today()
+            assert today_duration >= 5 * Constants.ACTIVITY_DURATION
+        else:
+            assert False

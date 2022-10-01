@@ -1,6 +1,7 @@
 """Working with timer data"""
 
 import collections
+import datetime
 import os
 
 import pandas as pd
@@ -45,6 +46,16 @@ class TimerData:
         """Return the sum of all durations"""
         self.read_record()
         return self.file_data['duration'].sum()
+
+    def sum_duration_for_today(self):
+        """Return the sum of all durations for today"""
+        activities = self.activities_to_namedtuple()
+        today = datetime.datetime.now().strftime('%d/%m/%Y')
+        sum_duration = 0
+        for activity in activities:
+            if activity.date == today:
+                sum_duration += activity.duration
+        return sum_duration
 
     def max_duration(self):
         """Return the activity with the longest duration"""
