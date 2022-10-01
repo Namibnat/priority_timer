@@ -19,6 +19,7 @@ class TimerData:
         self.data_frame_columns = ['date', 'activity', 'start', 'stop', 'duration']
 
     def read_record(self):
+        """Read the record file"""
         try:
             self.file_data = pd.read_csv(
                 os.path.join(self.home, self.timer_dir, self.record_file), delimiter=self.delimiter)
@@ -27,6 +28,7 @@ class TimerData:
         return self.file_data
 
     def activities_to_namedtuple(self):
+        """Return a list of activities as named tuple"""
         self.read_record()
         activities = []
         for index, row in self.file_data.iterrows():
@@ -39,5 +41,30 @@ class TimerData:
             ))
         return activities
 
-    def __str__(self):
+    def sum_duration(self):
+        """Return the sum of all durations"""
+        self.read_record()
+        return self.file_data['duration'].sum()
+
+    def max_duration(self):
+        """Return the activity with the longest duration"""
+        activity_with_max_duration = None
+        activities = self.activities_to_namedtuple()
+        max_duration = 0
+        for activity in activities:
+            if activity.duration > max_duration:
+                max_duration = activity.duration
+                activity_with_max_duration = activity
+        return activity_with_max_duration
+
+    def __getitem__(self, position):
+        """Return the activity at the given position"""
+        activities = self.activities_to_namedtuple()
+        return activities[position]
+
+    def __repr__(self):
         return f'Data from {self.record_file}'
+
+    def __len__(self):
+        self.read_record()
+        return self.file_data[self.file_data.columns[0]].count()

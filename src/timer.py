@@ -33,6 +33,7 @@ class Timer:
         self.defines.DATE = datetime.datetime.now().strftime('%d/%m/%Y')
 
     def create_record_file(self):
+        """Create the record file"""
         if not os.path.exists(os.path.join(self.home, self.timer_dir)):
             os.mkdir(os.path.join(self.home, self.timer_dir))
         if not os.path.exists(os.path.join(self.home, self.timer_dir, self.record_file)):
@@ -42,13 +43,16 @@ class Timer:
                 print(f'Timer record file "{self.record_file}" created')
 
     def start(self):
+        """Start the timer"""
         self.defines.START = datetime.datetime.now()
 
     def end(self):
+        """End the timer and calculate the duration"""
         self.defines.STOP = datetime.datetime.now()
         self.defines.DURATION = (self.defines.STOP - self.defines.START).seconds
 
     def record(self):
+        """Record the activity"""
         self.file_data = self.data.read_record()
         new_entry = [
             self.defines.DATE,
@@ -67,8 +71,9 @@ class Timer:
         self._write_record()
 
     def _write_record(self):
+        """Write the record file"""
         self.file_data.to_csv(
             os.path.join(self.home, self.timer_dir, self.record_file), index=False, sep=self.delimiter)
 
-    def __str__(self):
+    def __repr__(self):
         return f'Activity timer for {self.activity}'
