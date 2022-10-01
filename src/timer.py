@@ -49,7 +49,7 @@ class Timer:
         self.defines.DURATION = (self.defines.STOP - self.defines.START).seconds
 
     def record(self):
-        self.data.read_record()
+        self.file_data = self.data.read_record()
         new_entry = [
             self.defines.DATE,
             self.activity,
@@ -59,10 +59,11 @@ class Timer:
         ]
         if not all(new_entry):
             raise ValueError(f'Missing data: {new_entry}')
+        new_df = pd.DataFrame([new_entry], columns=self.data_frame_columns)
         if not isinstance(self.file_data, pd.DataFrame):
-            self.file_data = pd.DataFrame([new_entry], columns=self.data_frame_columns)
+            self.file_data = new_df
         else:
-            self.file_data = self.file_data.append(pd.DataFrame([new_entry], columns=self.data_frame_columns))
+            self.file_data = pd.concat([self.file_data, new_df], ignore_index=True)
         self._write_record()
 
     def _write_record(self):
