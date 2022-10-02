@@ -51,9 +51,8 @@ class Timer:
         self.defines.STOP = datetime.datetime.now()
         self.defines.DURATION = (self.defines.STOP - self.defines.START).seconds
 
-    def record(self):
-        """Record the activity"""
-        self.file_data = self.data.read_record()
+    def new_entry_to_data_frame(self):
+        """Return a new entry as data frame"""
         new_entry = [
             self.defines.DATE,
             self.activity,
@@ -63,7 +62,12 @@ class Timer:
         ]
         if not all(new_entry):
             raise ValueError(f'Missing data: {new_entry}')
-        new_df = pd.DataFrame([new_entry], columns=self.data_frame_columns)
+        return pd.DataFrame([new_entry], columns=self.data_frame_columns)
+
+    def record(self):
+        """Record the activity"""
+        self.file_data = self.data.read_record()
+        new_df = self.new_entry_to_data_frame()
         if not isinstance(self.file_data, pd.DataFrame):
             self.file_data = new_df
         else:

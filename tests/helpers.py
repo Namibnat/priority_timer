@@ -18,6 +18,7 @@ def instantiate_timer(activity=None):
 
 
 def run_timer(activity, set_duration=Constants.ACTIVITY_DURATION):
+    """Run a timer for tests"""
     timer = instantiate_timer(activity)
     timer.start()
     # Override timer.end() to save time, otherwise we have to wait a few seconds
