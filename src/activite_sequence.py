@@ -7,7 +7,7 @@ from .timer import Timer
 class Day:
     """Day class"""
 
-    def __init__(self, activities=[]):
+    def __init__(self, activities: list):
         self.activities = activities
         self.timer = Timer()
 
@@ -28,7 +28,6 @@ class Day:
         for activity in self.activities:
             self.prompt_start_activity(activity)
             self.prompt_end_activity(activity)
-            self.timer.record()
         print('Day completed')
 
 
